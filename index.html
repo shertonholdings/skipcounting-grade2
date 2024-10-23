@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 2 - Skip Counting (2s, 5s, 10s)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #logo img {
+            width: 150px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        #question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .drop-area {
+            width: 50px;
+            height: 50px;
+            border: 2px dashed #4CAF50;
+            display: inline-block;
+            vertical-align: top;
+            margin: 0 10px;
+        }
+        .number {
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 20px;
+            margin: 5px;
+        }
+        .correct {
+            background-color: #c8e6c9; /* Light green */
+        }
+        .wrong {
+            background-color: #ffcdd2; /* Light red */
+        }
+        #feedback {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        #more-lessons {
+            margin-top: 40px;
+            font-size: 18px;
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        #more-lessons:hover {
+            background-color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Logo at the top -->
+    <div id="logo">
+        <img src="https://i.imgur.com/mwpTHJj.png" alt="Logo">
+    </div>
+
+    <h1>Skip Counting (2s, 5s, 10s)</h1>
+
+    <!-- Question -->
+    <div id="question"></div>
+
+    <!-- Drag-and-Drop Area -->
+    <div id="drop-area" class="drop-area"></div>
+
+    <!-- Number Options -->
+    <div id="number-options"></div>
+
+    <div id="feedback"></div>
+
+    <!-- "More Lessons" button at the bottom -->
+    <a id="more-lessons" href="https://sites.google.com/view/grades-2/home">More Lessons</a>
+
+    <script>
+        let correctAnswer;
+
+        // Generate a random skip counting question
+        function generateQuestion() {
+            const types = [2, 5, 10];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const start = type * Math.floor(Math.random() * 10) + 1;
+            const sequence = [];
+
+            for (let i = 0; i < 4; i++) {
+                sequence.push(start + (i * type));
+            }
+
+            const missingIndex = Math.floor(Math.random() * 4);
+            correctAnswer = start + (missingIndex * type);
+            sequence[missingIndex] = "__"; // Placeholder for missing number
+
+            document.getElementById('question').innerText = `Complete the sequence: ${sequence.join(', ')}`;
+            createNumberOptions(correctAnswer, type);
+            document.getElementById('drop-area').innerHTML = ''; // Clear previous drops
+            document.getElementById('feedback').innerText = ''; // Clear feedback
+        }
+
+        // Create number options for drag-and-drop
+        function createNumberOptions(correctAnswer, type) {
+            const options = new Set();
+            options.add(correctAnswer);
+            while (options.size < 3) {
+                options.add(type * (Math.floor(Math.random() * 10) + 1)); // Random numbers
+            }
+            options.forEach(num => {
+                const numberDiv = document.createElement("div");
+                numberDiv.className = "number";
+                numberDiv.draggable = true;
+                numberDiv.innerText = num;
+                numberDiv.ondragstart = (event) => {
+                    event.dataTransfer.setData("text/plain", num);
+                };
+                document.getElementById('number-options').appendChild(numberDiv);
+            });
+        }
+
+        // Allow dropping in the area
+        document.getElementById('drop-area').ondragover = (event) => {
+            event.preventDefault();
+        };
+
+        document.getElementById('drop-area').ondrop = (event) => {
+            const droppedNumber = event.dataTransfer.getData("text/plain");
+            document.getElementById('drop-area').innerText = droppedNumber; // Show dropped number
+            checkAnswer(droppedNumber);
+        };
+
+        // Check the answer
+        function checkAnswer(userAnswer) {
+            if (parseInt(userAnswer) === correctAnswer) {
+                document.getElementById('feedback').innerText = "Correct! Well done!";
+                document.getElementById('feedback').style.color = "green";
+                document.getElementById('drop-area').className += " correct";
+                setTimeout(generateQuestion, 2000); // Move to next question after 2 seconds
+            } else {
+                document.getElementById('feedback').innerText = "Oops! Try again!";
+                document.getElementById('feedback').style.color = "red";
+                document.getElementById('drop-area').className += " wrong";
+                setTimeout(() => {
+                    document.getElementById('drop-area').innerHTML = ''; // Clear the drop area
+                    document.getElementById('drop-area').className = "drop-area"; // Reset class
+                }, 1000);
+            }
+        }
+
+        // Initialize question on page load
+        window.onload = function() {
+            generateQuestion();
+        }
+    </script>
+
+</body>
+</html>
+
